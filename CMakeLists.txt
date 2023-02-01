@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
-project(TOFInfo)
+project(PeterProcessor)
 set(CMAKE_CXX_STANDARD 17)
 
 
@@ -12,7 +12,7 @@ message(STATUS "C++ flags are set to: " ${CMAKE_CXX_FLAGS})
 
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
-add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCE_DIR}/src/TOFInfo.cpp)
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCE_DIR}/src/PeterProcessor.cpp)
 
 ### DEPENDENCIES ###
 find_package(Marlin REQUIRED)

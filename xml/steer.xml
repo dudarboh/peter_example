@@ -4,19 +4,29 @@
 
     <execute>
         <processor name="InitDD4hep" />
-        <processor name="peterExample"/>
+        <processor name="PeterExample"/>
     </execute>
 
     <global>
+        <!-- some 4 jet files -->
         <parameter name="LCIOInputFiles" type="StringVec">
-            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/2f_hadronic_eL_pR/ILD_l5_o1_v02/v02-02/00015161/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500010.P2f_z_h.eL.pR.n001_209.d_rec_00015161_259.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_001.d_rec_00015122_20.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_002.d_rec_00015122_73.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_003.d_rec_00015122_178.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_004.d_rec_00015122_84.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_005.d_rec_00015122_192.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_006.d_rec_00015122_200.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_007.d_rec_00015122_87.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_008.d_rec_00015122_101.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_009.d_rec_00015122_155.slcio
+            /pnfs/desy.de/ilc/prod/ilc/mc-2020/ild/rec/250-SetA/4f_ZZ_hadronic/ILD_l5_o1_v02/v02-02/00015122/000/rv02-02.sv02-02.mILD_l5_o1_v02.E250-SetA.I500062.P4f_zz_h.eL.pR.n000_010.d_rec_00015122_21.slcio
         </parameter>
-        <!-- <parameter name="MaxRecordNumber" type="int">0</parameter>
+        <parameter name="MaxRecordNumber" type="int">10</parameter>
         <parameter name="SkipNEvents" type="int">0</parameter>
         <parameter name="SupressCheck" type="bool">false</parameter>
         <parameter name="AllowToModifyEvent" type="bool">false</parameter>
         <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT" type="string">MESSAGE</parameter>
-        <parameter name="RandomSeed" type="int">1234567890</parameter> -->
+        <parameter name="RandomSeed" type="int">1234567890</parameter>
     </global>
 
     <processor name="InitDD4hep" type="InitializeDD4hep">
@@ -25,6 +35,7 @@
         </parameter>
     </processor>
 
-    <processor name="peterExample" type="TOFInfo">
+    <processor name="PeterExample" type="PeterProcessor">
+        <parameter name="eventDisplay">true</parameter>
     </processor>
 </marlin>
