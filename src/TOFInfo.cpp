@@ -83,11 +83,20 @@ void TOFInfo::processEvent(EVENT::LCEvent * event){
 
         cout<<endl<<"        ======PFO "<<i+1<<"===== PDG: "<<mc->getPDG()<<" ======"<<endl;
         //the main fun in these functions
-        printOutputFCN(pfo);
+        // printOutputFCN(pfo);
         // printOutputGNN(pfo);
         // printOutputCCN(pfo);
-        
-        drawPFO(event, pfo);
+
+        vector<CalorimeterHit*> hits = pfo->getClusters()[0]->getCalorimeterHits();
+        int nTotalHits = hits.size();
+        int nEcalHits = 0;
+        for(auto* hit : hits){
+            bool isECALHit = ( CHT(hit->getType()).caloID() == CHT::ecal );
+            if ( isECALHit ) nEcalHits++;
+        }
+
+        if (nEcalHits == 0 && nTotalHits != 0)
+            drawPFO(event, pfo);
     }
 }
 
