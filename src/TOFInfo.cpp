@@ -91,7 +91,9 @@ void TOFInfo::processEvent(EVENT::LCEvent * event){
         int nTotalHits = hits.size();
         int nEcalHits = 0;
         for(auto* hit : hits){
-            bool isECALHit = ( CHT(hit->getType()).caloID() == CHT::ecal );
+            // bool isECALHit = ( CHT(hit->getType()).caloID() == CHT::ecal );
+            std::cout<<CHT(hit->getType())<<std::endl;
+            bool isECALHit = ( CHT(hit->getType()).caloType() == CHT::em );
             if ( isECALHit ) nEcalHits++;
         }
 
