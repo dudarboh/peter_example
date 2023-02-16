@@ -13,6 +13,7 @@
 #include "CLHEP/Random/Randomize.h"
 #include "HelixClass.h"
 #include "marlinutil/CalorimeterHitType.h"
+#include "UTIL/ILDConf.h"
 
 using namespace EVENT;
 using dd4hep::rec::Vector3D;
@@ -21,6 +22,32 @@ using UTIL::LCRelationNavigator;
 TOFInfo aTOFInfo ;
 
 TOFInfo::TOFInfo() : marlin::Processor("TOFInfo") {}
+
+
+std::vector<EVENT::Track*> getSubTracks(EVENT::Track* track){
+    vector<Track*> subTracks;
+    subTracks.push_back(track);
+
+    int nSubTracks = track->getTracks().size();
+    if (nSubTracks <= 1) return subTracks;
+
+    int nTPCHits = track->getSubdetectorHitNumbers()[(ILDDetID::TPC)*2-1];
+    int nSubTrack0Hits = track->getTracks()[0]->getTrackerHits().size();
+    int nSubTrack1Hits = track->getTracks()[1]->getTrackerHits().size();
+
+    //OPTIMIZE: this is not reliable, but I don't see any other way at the moment.
+    //Read documentation in the header file for details.
+    int startIdx;
+    if( std::abs(nTPCHits - nSubTrack0Hits) <= 1  ) startIdx = 1;
+    else if ( std::abs(nTPCHits - nSubTrack1Hits) <= 1 ) startIdx = 2;
+    else{
+        //FIXME: This happens very rarily (0.01%) for unknown reasons, so we just, skip adding subTracks...
+        streamlog_out(WARNING)<<"Can't understand which subTrack is responsible for the first TPC hits! Skip adding subTracks."<<std::endl;
+        return subTracks;
+    }
+    for(int j=startIdx; j < nSubTracks; ++j) subTracks.push_back( track->getTracks()[j] );
+    return subTracks;
+}
 
 
 void TOFInfo::init(){
@@ -154,32 +181,44 @@ void TOFInfo::drawPFO(EVENT::LCEvent* event, EVENT::ReconstructedParticle* pfo){
     DDMarlinCED::drawDD4hepDetector(_detector, false, vector<string>{""});
     DDCEDPickingHandler& pHandler= DDCEDPickingHandler::getInstance();
     pHandler.update(event);
-    
-    //draw PFO using momentum at the ECAL
-    Track* track = pfo->getTracks()[0];
-    const TrackState* tsEcal = track->getTrackState(TrackState::AtCalorimeter);
-    Vector3D pos ( tsEcal->getReferencePoint() );
-    Vector3D mom = getHelixMomAtTrackState(*tsEcal);
 
-    int marker = 1;
-    int size = 1;
-    unsigned long color = 0x4242f5;
-    DDMarlinCED::drawHelix(-_bField, -pfo->getCharge(), pos.x(), pos.y(), pos.z(), mom.x(), mom.y(), mom.z(), marker, size, color, 0., 3000., 3000., 0.);
-    DDMarlinCED::drawHelix(_bField, pfo->getCharge(), pos.x(), pos.y(), pos.z(), mom.x(), mom.y(), mom.z(), marker, size, color, 0., 3000., 3000., 0.);
+    Track* pfoTrack = pfo->getTracks()[0];
+    vector<Track*> tracks = getSubTracks(pfoTrack);
+    int nHits = 0;
+    for(auto* track: tracks){
+        auto hits = track->getTrackerHits();
+        for (auto* hit : hits){
+            ++nHits;
+            auto pos = hit->getPosition();
+            int type = 0; // point
+            int layer = 1; // doesn't matter
+            int size = 4; // larger point
 
-    Cluster* cluster = pfo->getClusters()[0];
-    int type = 0; // point
-    int pointSize = 5;
-    for( auto hit : cluster->getCalorimeterHits() ){
-        Vector3D hitPos (hit->getPosition());
+            unsigned long color = 0x3232a8;
+            if ( (nHits) % 20 == 0){
+                color = 0xfa0730;
+                size = 8;
+            }
+            ced_hit_ID(pos[0], pos[1], pos[2], type, layer, size, color, 0 ); // tracker hits
+        }
+    }
+    std::vector<Cluster*> clusters = pfo->getClusters();
+    for(auto* cluster: clusters){
+        auto hits = cluster->getCalorimeterHits();
+        for (auto* hit: hits){
+            auto pos = hit->getPosition();
+            int type = 0; // point
+            int layer = 1; // doesn't matter
+            int size = 6; // larger point
+            unsigned long color;
+            CHT hitType( hit->getType() );
+            bool isECALHit = ( hitType.caloID() == CHT::ecal );
+            if ( isECALHit ) color = 0x09ed1c;
+            else  color = 0x7a1d1d;
 
-        unsigned long hitColor;
-        CHT hitType( hit->getType() );
-        bool isECALHit = ( hitType.caloID() == CHT::ecal );
-        if ( isECALHit ) hitColor = 0x09ed1c;
-        else  hitColor = 0x7a1d1d;
-        
-        ced_hit_ID(hitPos.x(), hitPos.y(), hitPos.z(), type, 0, pointSize, hitColor, 0);
+
+            ced_hit_ID(pos[0], pos[1], pos[2], type, layer, size, color, 0 );
+        }
     }
 
     DDMarlinCED::draw(this);
